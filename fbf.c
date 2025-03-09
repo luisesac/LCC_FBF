@@ -2,25 +2,46 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+//  Checar el caracter en el que el for (más adelante) se encuentra y compararlo con el anterior para verificar que sea un caracter válido para insertar.
+int check_char(int previous, int current);
+
+void check_fbf(char* fbf);
+
+int main()
+{
+    char fbf[50];
+    printf("Introduzca la fbf \n -> ");
+    fgets(fbf, sizeof(fbf), stdin);
+    check_fbf(fbf);
+    printf("\n________________________________\n");
+    return 0;
+}
+
 int check_char(int previous, int current)
 {
-    if((previous == 126 || previous == 40) && ((current >= 112 && current <= 116) || current == 40))
+    // ((previous = "(" AND current = "~") OR (previous = "~" AND current = "("))  
+    if((previous == 40 && current == 126) || (previous == 126 && current == 40))
     {
         return 1;
     }
-    else if(current == 41 && (previous >= 112 && previous <= 116))
+    //  ((previous = "~" OR previous = "(")) AND ((current = {"p", "q", "r", "s", "t"}))
+    if((previous == 126 || previous == 40) && (current >= 112 && current <= 116))
     {
         return 1;
     }
+    // (current = ")") AND (previous = {"p", "q", "r", "s", "t"} OR (current = ")") AND (previous = ")"))
+    else if(current == 41 && ((previous >= 112 && previous <= 116) || previous == 41))
+    {
+        return 1;
+    }
+    // ((current = "*" OR current = "+")) AND (previous = ")")  
     else if ((current == 42 || current == 43) && previous == 41)
     {
         return 1;
     }
+    // (current = "(") AND (previous = "*" OR previous = "+" OR previous = "(")  
     else if (current == 40 && (previous == 42 || previous == 43 || previous == 40))
-    {
-        return 1;
-    }
-    else if (current == 41 && previous == 41)
     {
         return 1;
     }
@@ -50,38 +71,34 @@ void check_fbf(char* fbf)
                 printf("No es una fbf.\n");
                 break;
             }
+            //  Aumentar en 1 cada vez que se abre un paréntesis
             if(fbf[i] == 40)
             {
                 unclosed_par += 1;
             }
+            //  Disminuir en 1 cada vez que se cierra un paréntesis
             if(fbf[i] == 41)
             {
                 unclosed_par -= 1;
             }
         }
+
+        //  Si no hay paréntesis sin cerrar y pasa todo el for loop sin errores, es una fbf.
         if(unclosed_par == 0)
         {
             printf("Es una fbf.\n");
         }
+        //  Si hay paréntesis sin cerrar y pasa todo el for loop sin errores, no es una fbf.
         else
         {
             printf("No es una fbf.\n");
         }
     }
     else
+    //  La fórmula no empezó como debía "(" o "~".
     {
         printf("%d", fbf[0]);
         printf("No es una fbf.\n");
         return;
     }    
-}
-
-int main()
-{
-    char fbf[50];
-    printf("Introduzca la fbf \n -> ");
-    fgets(fbf, sizeof(fbf), stdin);
-    check_fbf(fbf);
-    printf("\n________________________________\n");
-    return 0;
 }
